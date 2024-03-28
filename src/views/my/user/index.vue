@@ -91,7 +91,7 @@
 						</el-table-column>
 						<el-table-column :label="$t('sysuser.ehrStatus')" show-overflow-tooltip>
 							<template #default="scope">
-								<el-switch v-model="scope.row.ehrStatus" @change="changeSwitch(scope.row)" active-value=1 inactive-value=0></el-switch>
+								<el-switch v-model="scope.row.ehrStatus" @change="changeSwitch(scope.row)" :active-value="0" :inactive-value="1"></el-switch>
 							</template>
 						</el-table-column>
 						<!-- <el-table-column :label="$t('sysuser.createTime')" prop="createTime" show-overflow-tooltip width="180"></el-table-column> -->
@@ -139,7 +139,7 @@ import { deptTree } from '/@/api/admin/dept';
 import { BasicTableProps, useTable } from '/@/hooks/table';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
-import { userList } from '/@/api/my/user';
+import { userList, updateUser } from '/@/api/my/user';
 
 userList().then(res => {
 	console.log(res)
@@ -230,7 +230,7 @@ const handleDelete = async (ids: string[]) => {
 
 //表格内开关 (用户状态)
 const changeSwitch = async (row: object) => {
-	await putObj(row);
+	await updateUser(row);
 	useMessage().success(t('common.optSuccessText'));
 	getDataList();
 };

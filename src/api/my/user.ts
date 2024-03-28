@@ -7,3 +7,11 @@ export const userList = (params?: Object) => {
 		params,
 	});
 };
+
+export const updateUser = (obj: Object) => {
+	return request({
+		url: '/my/user',
+		method: 'put',
+		data: obj,
+	});
+};
