@@ -26,7 +26,7 @@
 					<el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.role')" prop="role">
 							<el-select class="w100" clearable multiple placeholder="请选择角色" v-model="dataForm.role">
-								<el-option :key="item.roleId" :label="item.roleName" :value="item.roleId" v-for="item in roleData" />
+								<el-option :key="item.roleCode" :label="item.roleName" :value="item.roleCode" v-for="item in roleData" />
 							</el-select>
 						</el-form-item>
 					</el-col>
@@ -38,7 +38,7 @@
 						</el-form-item>
 					</el-col>
 					<el-col :span="12" class="mb20">
-						<el-form-item :label="$t('sysuser.dept')" prop="deptId">
+						<el-form-item :label="$t('sysuser.dept')" prop="brNo">
 							<el-tree-select
 								:data="deptData"
 								:props="{ value: 'id', label: 'name', children: 'children' }"
@@ -46,7 +46,7 @@
 								class="w100"
 								clearable
 								placeholder="请选择所属部门"
-								v-model="dataForm.deptId"
+								v-model="dataForm.brNo"
 							>
 							</el-tree-select>
 						</el-form-item>
@@ -86,10 +86,13 @@ import { addObj, getObj, putObj, validatePhone, validateUsername } from '/@/api/
 import { list as roleList } from '/@/api/admin/role';
 import { list as postList } from '/@/api/admin/post';
 import { deptTree } from '/@/api/admin/dept';
+import { myDeptTree } from '/@/api/my/dept';
 import { useDict } from '/@/hooks/dict';
 import { useI18n } from 'vue-i18n';
 import { useMessage } from '/@/hooks/message';
 import { rule } from '/@/utils/validate';
+import { myGetObj, updateUser } from '/@/api/my/user';
+import { myRoleList } from '/@/api/my/role';
 
 const { t } = useI18n();
 
@@ -115,7 +118,7 @@ const dataForm = reactive({
 	qqOpenid: '',
 	lockFlag: '0',
 	phone: '' as String | undefined,
-	deptId: '',
+	brNo: '',
 	roleList: [],
 	postList: [],
 	nickname: '',
@@ -127,16 +130,16 @@ const dataForm = reactive({
 
 const dataRules = ref({
 	// 用户名校验，不能为空 、长度 5-20、不能和已有数据重复
-	username: [
-		{ required: true, message: '用户名不能为空', trigger: 'blur' },
-		{ min: 5, max: 20, message: '用户名称长度必须介于 5 和 20 之间', trigger: 'blur' },
-		{
-			validator: (rule: any, value: any, callback: any) => {
-				validateUsername(rule, value, callback, dataForm.userId !== '');
-			},
-			trigger: 'blur',
-		},
-	],
+	// username: [
+	// 	{ required: true, message: '用户名不能为空', trigger: 'blur' },
+	// 	{ min: 5, max: 20, message: '用户名称长度必须介于 5 和 20 之间', trigger: 'blur' },
+	// 	{
+	// 		validator: (rule: any, value: any, callback: any) => {
+	// 			validateUsername(rule, value, callback, dataForm.userId !== '');
+	// 		},
+	// 		trigger: 'blur',
+	// 	},
+	// ],
 	password: [
 		{ required: true, message: '密码不能为空', trigger: 'blur' },
 		{
@@ -155,16 +158,16 @@ const dataRules = ref({
 	role: [{ required: true, message: '角色不能为空', trigger: 'blur' }],
 	post: [{ required: true, message: '岗位不能为空', trigger: 'blur' }],
 	// 手机号校验，不能为空、新增的时不能重复校验
-	phone: [
-		{ required: true, message: '手机号不能为空', trigger: 'blur' },
-		{ validator: rule.validatePhone, trigger: 'blur' },
-		{
-			validator: (rule: any, value: any, callback: any) => {
-				validatePhone(rule, value, callback, dataForm.userId !== '');
-			},
-			trigger: 'blur',
-		},
-	],
+	// phone: [
+	// 	{ required: true, message: '手机号不能为空', trigger: 'blur' },
+	// 	{ validator: rule.validatePhone, trigger: 'blur' },
+	// 	{
+	// 		validator: (rule: any, value: any, callback: any) => {
+	// 			validatePhone(rule, value, callback, dataForm.userId !== '');
+	// 		},
+	// 		trigger: 'blur',
+	// 	},
+	// ],
 	email: [{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
 	lockFlag: [{ required: true, message: '状态不能为空', trigger: 'blur' }],
 });
@@ -206,7 +209,7 @@ const onSubmit = async () => {
 			if (password?.includes('******')) dataForm.password = undefined;
 
 			loading.value = true;
-			await putObj(dataForm);
+			await updateUser(dataForm);
 			useMessage().success(t('common.editSuccessText'));
 			visible.value = false; // 关闭弹窗
 			emit('refresh');
@@ -234,14 +237,16 @@ const onSubmit = async () => {
 const getUserData = async (id: string) => {
 	try {
 		loading.value = true;
-		const { data } = await getObj(id);
+		const { data } = await myGetObj(id);
 		Object.assign(dataForm, data);
 		if (data.roleList) {
-			dataForm.role = data.roleList.map((item) => item.roleId);
+			dataForm.role = data.roleList.map((item: { roleCode: string; }) => item.roleCode);
 		}
 		if (data.postList) {
-			dataForm.post = data.postList.map((item) => item.postId);
+			dataForm.post = data.postList.map((item: { postId: any; }) => item.postId);
 		}
+		console.log(data)
+		console.log(dataForm)
 	} catch (err: any) {
 		useMessage().error(err.msg);
 	} finally {
@@ -252,10 +257,10 @@ const getUserData = async (id: string) => {
 // 初始化部门数据
 const getDeptData = () => {
 	// 获取部门数据
-	deptTree().then((res) => {
+	myDeptTree().then((res) => {
 		deptData.value = res.data;
 		// 默认选择第一个
-		dataForm.deptId = res.data[0].id;
+		dataForm.brNo = res.data[0].id;
 	});
 };
 
@@ -269,10 +274,10 @@ const getPostData = () => {
 };
 // 角色数据
 const getRoleData = () => {
-	roleList().then((res) => {
+	myRoleList().then((res) => {
 		roleData.value = res.data;
 		// 默认选择第一个
-		dataForm.role = [res.data[0].roleId];
+		// dataForm.role = [res.data[0].roleCode];
 	});
 };
 

@@ -15,3 +15,10 @@ export const updateUser = (obj: Object) => {
 		data: obj,
 	});
 };
+
+export const myGetObj = (id: String) => {
+	return request({
+		url: '/my/user/details/' + id,
+		method: 'get',
+	});
+};

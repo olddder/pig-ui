@@ -78,7 +78,7 @@
 						<!-- <el-table-column :label="$t('sysuser.index')" type="index" width="60" fixed="left" /> -->
 						<el-table-column :label="$t('sysuser.ehrNo')" prop="ehrNo" fixed="left" show-overflow-tooltip></el-table-column>
 						<el-table-column :label="$t('sysuser.name')" prop="name" show-overflow-tooltip></el-table-column>
-						<el-table-column :label="$t('sysuser.brNo')" prop="brNo" show-overflow-tooltip></el-table-column>
+						<el-table-column :label="$t('sysuser.dept')" prop="deptName" show-overflow-tooltip></el-table-column>
 						<!-- <el-table-column :label="$t('sysuser.ehrStatus')" show-overflow-tooltip>
 							<template #default="scope">
 								<el-tag v-for="(item, index) in scope.row.postList" :key="index">{{ item.postName }}</el-tag>
@@ -97,7 +97,7 @@
 						<!-- <el-table-column :label="$t('sysuser.createTime')" prop="createTime" show-overflow-tooltip width="180"></el-table-column> -->
 						<el-table-column :label="$t('common.action')" width="160" fixed="right">
 							<template #default="scope">
-								<el-button v-auth="'sys_user_edit'" icon="edit-pen" text type="primary" @click="userDialogRef.openDialog(scope.row.userId)">
+								<el-button v-auth="'sys_user_edit'" icon="edit-pen" text type="primary" @click="userDialogRef.openDialog(scope.row.id)">
 									{{ $t('common.editBtn') }}
 								</el-button>
 								<el-tooltip :content="$t('sysuser.deleteDisabledTip')" :disabled="scope.row.userId !== '1'" placement="top">
@@ -166,9 +166,8 @@ const multiple = ref(true);
 // 定义表格查询、后台调用的API
 const state: BasicTableProps = reactive<BasicTableProps>({
 	queryForm: {
-		deptId: '',
-		username: '',
-		phone: '',
+		brNo: '',
+		name: ''
 	},
 	pageList: userList,
 });
@@ -186,13 +185,14 @@ const deptData = reactive({
 // 清空搜索条件
 const resetQuery = () => {
 	queryRef.value?.resetFields();
-	state.queryForm.deptId = '';
+	state.queryForm.brNo = '';
 	getDataList();
 };
 
 // 点击树
 const handleNodeClick = (e: any) => {
-	state.queryForm.deptId = e.id;
+	console.log(e)
+	state.queryForm.brNo = e.id;
 	getDataList();
 };
 

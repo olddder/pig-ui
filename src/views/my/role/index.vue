@@ -97,8 +97,10 @@
 <script setup lang="ts" name="systemRole">
 import { BasicTableProps, useTable } from '/@/hooks/table';
 import { pageList, delObj } from '/@/api/admin/role';
+import { myRolePage } from '/@/api/my/role';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
+
 
 // 引入组件
 const RoleDialog = defineAsyncComponent(() => import('./form.vue'));
@@ -120,7 +122,7 @@ const state: BasicTableProps = reactive<BasicTableProps>({
 	queryForm: {
 		roleName: '',
 	},
-	pageList: pageList, // H
+	pageList: myRolePage, // H
 	descs: ['create_time'],
 });
 
