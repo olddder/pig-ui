@@ -136,6 +136,7 @@
 <script lang="ts" name="systemUser" setup>
 import { delObj, pageList, putObj } from '/@/api/admin/user';
 import { deptTree } from '/@/api/admin/dept';
+import { myDeptTree } from '/@/api/my/dept';
 import { BasicTableProps, useTable } from '/@/hooks/table';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
@@ -176,7 +177,7 @@ const { getDataList, currentChangeHandle, sizeChangeHandle, downBlobFile, tableS
 // 部门树使用的数据
 const deptData = reactive({
 	queryList: (name: String) => {
-		return deptTree({
+		return myDeptTree({
 			deptName: name,
 		});
 	},
