@@ -3,7 +3,7 @@
 		<el-dialog :close-on-click-modal="false" :title="dataForm.userId ? $t('common.editBtn') : $t('common.addBtn')" draggable v-model="visible">
 			<el-form :model="dataForm" :rules="dataRules" label-width="90px" ref="dataFormRef" v-loading="loading">
 				<el-row :gutter="20">
-					<el-col :span="12" class="mb20">
+					<!-- <el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.username')" prop="username">
 							<el-input :disabled="dataForm.userId !== ''" placeholder="请输入用户名" v-model="dataForm.username"></el-input>
 						</el-form-item>
@@ -12,17 +12,22 @@
 						<el-form-item :label="$t('sysuser.password')" prop="password">
 							<el-input clearable placeholder="请输入密码" type="password" v-model="dataForm.password"></el-input>
 						</el-form-item>
-					</el-col>
+					</el-col> -->
 					<el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.name')" prop="name">
 							<el-input clearable placeholder="请输入姓名" v-model="dataForm.name"></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :span="12" class="mb20">
+						<el-form-item :label="$t('sysuser.ehrNo')" prop="ehrNo">
+							<el-input clearable placeholder="请输入员工号" v-model="dataForm.ehrNo"></el-input>
+						</el-form-item>
+					</el-col>
+					<!-- <el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.phone')" prop="phone">
 							<el-input clearable placeholder="请输入手机号" v-model="dataForm.phone"></el-input>
 						</el-form-item>
-					</el-col>
+					</el-col> -->
 					<el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.role')" prop="role">
 							<el-select class="w100" clearable multiple placeholder="请选择角色" v-model="dataForm.role">
@@ -30,13 +35,13 @@
 							</el-select>
 						</el-form-item>
 					</el-col>
-					<el-col :span="12" class="mb20">
+					<!-- <el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.post')" prop="post">
 							<el-select class="w100" clearable multiple placeholder="请选择岗位" v-model="dataForm.post">
 								<el-option :key="item.postId" :label="item.postName" :value="item.postId" v-for="item in postData" />
 							</el-select>
 						</el-form-item>
-					</el-col>
+					</el-col> -->
 					<el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.dept')" prop="brNo">
 							<el-tree-select
@@ -47,12 +52,13 @@
 								clearable
 								placeholder="请选择所属部门"
 								v-model="dataForm.brNo"
+								filterable
 							>
 							</el-tree-select>
 						</el-form-item>
 					</el-col>
 
-					<el-col :span="12" class="mb20">
+					<!-- <el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.email')" prop="email">
 							<el-input clearable placeholder="请输入邮箱" v-model="dataForm.email"></el-input>
 						</el-form-item>
@@ -61,11 +67,11 @@
 						<el-form-item :label="$t('sysuser.nickname')" prop="nickname">
 							<el-input clearable placeholder="请输入昵称" v-model="dataForm.nickname"></el-input>
 						</el-form-item>
-					</el-col>
+					</el-col> -->
 					<el-col :span="12" class="mb20">
-						<el-form-item :label="$t('sysuser.lockFlag')" prop="lockFlag">
-							<el-radio-group v-model="dataForm.lockFlag">
-								<el-radio :key="index" :label="item.value" border v-for="(item, index) in lock_flag">{{ item.label }} </el-radio>
+						<el-form-item :label="$t('sysuser.ehrStatus')" prop="ehrStatus">
+							<el-radio-group v-model="dataForm.ehrStatus">
+								<el-radio :key="index" :label="item.value" border v-for="(item, index) in ehr_status">{{ item.label }} </el-radio>
 							</el-radio-group>
 						</el-form-item>
 					</el-col>
@@ -91,7 +97,7 @@ import { useDict } from '/@/hooks/dict';
 import { useI18n } from 'vue-i18n';
 import { useMessage } from '/@/hooks/message';
 import { rule } from '/@/utils/validate';
-import { myGetObj, updateUser } from '/@/api/my/user';
+import { myGetObj, updateUser, addUser } from '/@/api/my/user';
 import { myRoleList } from '/@/api/my/role';
 
 const { t } = useI18n();
@@ -99,7 +105,7 @@ const { t } = useI18n();
 // 定义刷新表格emit
 const emit = defineEmits(['refresh']);
 // @ts-ignore
-const { lock_flag } = useDict('lock_flag');
+const { ehr_status } = useDict('ehr_status');
 
 // 定义变量内容
 const dataFormRef = ref();
@@ -111,7 +117,9 @@ const loading = ref(false);
 
 const dataForm = reactive({
 	userId: '',
+	id: '',
 	username: '',
+	ehrNo: '',
 	password: '' as String | undefined,
 	salt: '',
 	wxOpenid: '',
@@ -126,6 +134,7 @@ const dataForm = reactive({
 	email: '',
 	post: [] as string[],
 	role: [] as string[],
+	ehrStatus: '0'
 });
 
 const dataRules = ref({
@@ -154,7 +163,8 @@ const dataRules = ref({
 		{ required: true, message: '姓名不能为空', trigger: 'blur' },
 		{ validator: rule.chinese, trigger: 'blur' },
 	],
-	deptId: [{ required: true, message: '部门不能为空', trigger: 'blur' }],
+	ehrNo: [{ required: true, message: '员工号不能为空', trigger: 'blur' }],
+	brNo: [{ required: true, message: '部门不能为空', trigger: 'blur' }],
 	role: [{ required: true, message: '角色不能为空', trigger: 'blur' }],
 	post: [{ required: true, message: '岗位不能为空', trigger: 'blur' }],
 	// 手机号校验，不能为空、新增的时不能重复校验
@@ -201,9 +211,9 @@ const onSubmit = async () => {
 	if (!valid) return false;
 
 	try {
-		const { userId, phone, password } = dataForm;
+		const { id, phone, password } = dataForm;
 
-		if (userId) {
+		if (id) {
 			// 清除占位符，避免提交错误的数据
 			if (phone?.includes('*')) dataForm.phone = undefined;
 			if (password?.includes('******')) dataForm.password = undefined;
@@ -215,7 +225,8 @@ const onSubmit = async () => {
 			emit('refresh');
 		} else {
 			loading.value = true;
-			await addObj(dataForm);
+			console.log(dataForm)
+			await addUser(dataForm);
 			useMessage().success(t('common.addSuccessText'));
 			visible.value = false; // 关闭弹窗
 			emit('refresh');
@@ -245,8 +256,6 @@ const getUserData = async (id: string) => {
 		if (data.postList) {
 			dataForm.post = data.postList.map((item: { postId: any; }) => item.postId);
 		}
-		console.log(data)
-		console.log(dataForm)
 	} catch (err: any) {
 		useMessage().error(err.msg);
 	} finally {
@@ -260,7 +269,7 @@ const getDeptData = () => {
 	myDeptTree().then((res) => {
 		deptData.value = res.data;
 		// 默认选择第一个
-		dataForm.brNo = res.data[0].id;
+		// dataForm.brNo = res.data[0].id;
 	});
 };
 
@@ -269,7 +278,7 @@ const getPostData = () => {
 	postList().then((res) => {
 		postData.value = res.data;
 		// 默认选择第一个
-		dataForm.post = [res.data[0].postId];
+		// dataForm.post = [res.data[0].postId];
 	});
 };
 // 角色数据

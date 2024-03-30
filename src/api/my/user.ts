@@ -8,6 +8,14 @@ export const userList = (params?: Object) => {
 	});
 };
 
+export const addUser = (obj: Object) => {
+	return request({
+		url: '/my/user',
+		method: 'post',
+		data: obj,
+	});
+};
+
 export const updateUser = (obj: Object) => {
 	return request({
 		url: '/my/user',
