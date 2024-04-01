@@ -1,11 +1,12 @@
 <template>
 	<div class="layout-logo" v-if="setShowLogo" @click="onThemeConfigChange">
-		<img :src="bocLogo" class="layout-logo-boc" />
+		<img :src="bocLogo" class="layout-logo-boc"/>
 		<span style="margin-left:10px;">个金营销中枢</span>
 		<!-- <span>{{ themeConfig.globalTitle }}</span> -->
 	</div>
 	<div class="layout-logo-size" v-else @click="onThemeConfigChange">
-		<img :src="logoMini" class="layout-logo-size-img" />
+		<!-- <img :src="logoMini" class="layout-logo-size-img" /> -->
+		<img :src="bocLogo" class="layout-logo-size-img" />
 	</div>
 </template>
 
