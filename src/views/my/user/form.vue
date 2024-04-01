@@ -31,7 +31,7 @@
 					<el-col :span="12" class="mb20">
 						<el-form-item :label="$t('sysuser.role')" prop="role">
 							<el-select class="w100" clearable multiple placeholder="请选择角色" v-model="dataForm.role">
-								<el-option :key="item.roleCode" :label="item.roleName" :value="item.roleCode" v-for="item in roleData" />
+								<el-option :key="item.roleCode" :label="item.roleCode + '-' + item.roleName" :value="item.roleCode" v-for="item in roleData" />
 							</el-select>
 						</el-form-item>
 					</el-col>
@@ -183,7 +183,7 @@ const dataRules = ref({
 });
 
 // 打开弹窗
-const openDialog = async (id: string) => {
+const openDialog = async (userId: string) => {
 	visible.value = true;
 	dataForm.userId = '';
 
@@ -198,9 +198,9 @@ const openDialog = async (id: string) => {
 	getRoleData();
 
     // 修改获取用户信息
-	if (id) {
-		dataForm.userId = id;
-		await getUserData(id);
+	if (userId) {
+		dataForm.userId = userId;
+		await getUserData(userId);
 		dataForm.password = '******';
 	}
 };
@@ -211,9 +211,9 @@ const onSubmit = async () => {
 	if (!valid) return false;
 
 	try {
-		const { id, phone, password } = dataForm;
+		const { userId, phone, password } = dataForm;
 
-		if (id) {
+		if (userId) {
 			// 清除占位符，避免提交错误的数据
 			if (phone?.includes('*')) dataForm.phone = undefined;
 			if (password?.includes('******')) dataForm.password = undefined;
@@ -225,7 +225,6 @@ const onSubmit = async () => {
 			emit('refresh');
 		} else {
 			loading.value = true;
-			console.log(dataForm)
 			await addUser(dataForm);
 			useMessage().success(t('common.addSuccessText'));
 			visible.value = false; // 关闭弹窗
@@ -245,10 +244,10 @@ const onSubmit = async () => {
  * @param {string} id - 用户 ID
  * @return {Promise} - 包含用户数据的 Promise 对象
  */
-const getUserData = async (id: string) => {
+const getUserData = async (userId: string) => {
 	try {
 		loading.value = true;
-		const { data } = await myGetObj(id);
+		const { data } = await myGetObj(userId);
 		Object.assign(dataForm, data);
 		if (data.roleList) {
 			dataForm.role = data.roleList.map((item: { roleCode: string; }) => item.roleCode);

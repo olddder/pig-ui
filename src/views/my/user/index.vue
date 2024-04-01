@@ -86,18 +86,18 @@
 						</el-table-column> -->
 						<el-table-column :label="$t('sysuser.role')" show-overflow-tooltip>
 							<template #default="scope">
-								<el-tag v-for="(item, index) in scope.row.roleList" :key="index">{{ item.roleName }}</el-tag>
+								<el-tag v-for="(item, index) in scope.row.roleList" :key="index">{{ item.roleCode + '-' + item.roleName }}</el-tag>
 							</template>
 						</el-table-column>
 						<el-table-column :label="$t('sysuser.ehrStatus')" show-overflow-tooltip>
 							<template #default="scope">
-								<el-switch v-model="scope.row.ehrStatus" @change="changeSwitch(scope.row)" :active-value="0" :inactive-value="1"></el-switch>
+								<el-switch v-model="scope.row.ehrStatus" @change="changeSwitch(scope.row)" active-value="0" inactive-value="1"></el-switch>
 							</template>
 						</el-table-column>
 						<!-- <el-table-column :label="$t('sysuser.createTime')" prop="createTime" show-overflow-tooltip width="180"></el-table-column> -->
 						<el-table-column :label="$t('common.action')" width="160" fixed="right">
 							<template #default="scope">
-								<el-button v-auth="'sys_user_edit'" icon="edit-pen" text type="primary" @click="userDialogRef.openDialog(scope.row.id)">
+								<el-button v-auth="'sys_user_edit'" icon="edit-pen" text type="primary" @click="userDialogRef.openDialog(scope.row.userId)">
 									{{ $t('common.editBtn') }}
 								</el-button>
 								<el-tooltip :content="$t('sysuser.deleteDisabledTip')" :disabled="scope.row.userId !== '1'" placement="top">
@@ -140,11 +140,7 @@ import { myDeptTree } from '/@/api/my/dept';
 import { BasicTableProps, useTable } from '/@/hooks/table';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
-import { userList, updateUser } from '/@/api/my/user';
-
-userList().then(res => {
-	console.log(res)
-})
+import { delUser, userList, updateUser } from '/@/api/my/user';
 
 // 动态引入组件
 const UserForm = defineAsyncComponent(() => import('./form.vue'));
@@ -191,7 +187,6 @@ const resetQuery = () => {
 
 // 点击树
 const handleNodeClick = (e: any) => {
-	console.log(e)
 	state.queryForm.brNo = e.id;
 	getDataList();
 };
@@ -221,7 +216,7 @@ const handleDelete = async (ids: string[]) => {
 	}
 
 	try {
-		await delObj(ids);
+		await delUser(ids);
 		getDataList();
 		useMessage().success(t('common.delSuccessText'));
 	} catch (err: any) {

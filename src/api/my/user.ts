@@ -30,3 +30,11 @@ export const myGetObj = (id: String) => {
 		method: 'get',
 	});
 };
+
+export const delUser = (ids: Object) => {
+	return request({
+		url: '/my/user',
+		method: 'delete',
+		data: ids,
+	});
+};

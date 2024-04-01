@@ -37,7 +37,8 @@ import {rule} from '/@/utils/validate';
 import {deptTree} from '/@/api/admin/dept';
 import {useMessage} from '/@/hooks/message';
 import {addObj, getObj, putObj, validateRoleCode, validateRoleName} from '/@/api/admin/role';
-import {useI18n} from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
+import { getRole, updateRole} from '/@/my/admin/role';
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -122,7 +123,7 @@ const onSubmit = async () => {
 
   try {
     loading.value = true;
-    form.roleId ? await putObj(form) : await addObj(form);
+    form.roleCode ? await updateRole(form) : await addObj(form);
     useMessage().success(t(form.roleId ? 'common.editSuccessText' : 'common.addSuccessText'));
     visible.value = false;
     emit('refresh');
@@ -134,9 +135,9 @@ const onSubmit = async () => {
 };
 
 // 初始化角色数据
-const getRoleData = (id: string) => {
-  // 获取部门数据
-  getObj(id).then((res: any) => {
+const getRoleData = (roleCode: string) => {
+  // 获取角色数据
+  getRole(roleCode).then((res: any) => {
     Object.assign(form, res.data);
     if (res.data.dsScope) {
       dataForm.checkedDsScope = res.data.dsScope.split(',');

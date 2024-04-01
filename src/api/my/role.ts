@@ -15,3 +15,18 @@ export const myRolePage = (params?: Object) => {
 		params,
 	});
 };
+
+export const getRole = (id: string) => {
+	return request({
+		url: '/my/role/details/' + id,
+		method: 'get',
+	});
+};
+
+export const updateRole = (obj: Object) => {
+	return request({
+		url: '/my/role',
+		method: 'put',
+		data: obj,
+	});
+};

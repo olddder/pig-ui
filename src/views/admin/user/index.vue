@@ -140,6 +140,10 @@ import { BasicTableProps, useTable } from '/@/hooks/table';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
 
+pageList().then(res=>{
+	console.log(res)
+})
+
 // 动态引入组件
 const UserForm = defineAsyncComponent(() => import('./form.vue'));
 const QueryTree = defineAsyncComponent(() => import('/@/components/QueryTree/index.vue'));
