@@ -23,11 +23,11 @@
 				<div class="layout-padding-auto layout-padding-view">
 					<el-row v-show="showSearch">
 						<el-form ref="queryRef" :inline="true" :model="state.queryForm" @keyup.enter="getDataList">
-							<el-form-item :label="$t('sysuser.username')" prop="username">
-								<el-input v-model="state.queryForm.username" :placeholder="$t('sysuser.inputUsernameTip')" clearable />
+							<el-form-item :label="$t('sysuser.ehrNo')" prop="ehrNo">
+								<el-input v-model="state.queryForm.ehrNo" :placeholder="$t('sysuser.inputEhrNoTip')" clearable />
 							</el-form-item>
-							<el-form-item :label="$t('sysuser.phone')" prop="phone">
-								<el-input v-model="state.queryForm.phone" :placeholder="$t('sysuser.inputPhoneTip')" clearable />
+							<el-form-item :label="$t('sysuser.username')" prop="name">
+								<el-input v-model="state.queryForm.name" :placeholder="$t('sysuser.inputUsernameTip')" clearable />
 							</el-form-item>
 							<el-form-item>
 								<el-button icon="Search" type="primary" @click="getDataList">{{ $t('common.queryBtn') }}</el-button>
@@ -163,7 +163,8 @@ const multiple = ref(true);
 const state: BasicTableProps = reactive<BasicTableProps>({
 	queryForm: {
 		brNo: '',
-		name: ''
+		name: '',
+		ehrNo: ''
 	},
 	pageList: userList,
 });
@@ -182,6 +183,8 @@ const deptData = reactive({
 const resetQuery = () => {
 	queryRef.value?.resetFields();
 	state.queryForm.brNo = '';
+	state.queryForm.ehrNo = '';
+	state.queryForm.name = '';
 	getDataList();
 };
 

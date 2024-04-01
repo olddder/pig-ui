@@ -30,3 +30,19 @@ export const updateRole = (obj: Object) => {
 		data: obj,
 	});
 };
+
+export const addRole = (obj: Object) => {
+	return request({
+		url: '/my/role',
+		method: 'post',
+		data: obj,
+	});
+};
+
+export const delRole = (ids: Object) => {
+	return request({
+		url: '/my/role',
+		method: 'delete',
+		data: ids,
+	});
+};

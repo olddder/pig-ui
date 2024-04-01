@@ -52,7 +52,7 @@
 				<el-table-column prop="createTime" :label="$t('sysrole.createTime')" show-overflow-tooltip></el-table-column>
 				<el-table-column :label="$t('common.action')" width="250">
 					<template #default="scope">
-						<el-button text type="primary" icon="edit-pen" v-auth="'sys_role_edit'" @click="roleDialogRef.openDialog(scope.row.roleCode)">{{
+						<el-button text type="primary" icon="edit-pen" v-auth="'sys_role_edit'" @click="roleDialogRef.openDialog(scope.row.roleId)">{{
 							$t('common.editBtn')
 						}}</el-button>
 
@@ -97,10 +97,9 @@
 <script setup lang="ts" name="systemRole">
 import { BasicTableProps, useTable } from '/@/hooks/table';
 import { pageList, delObj } from '/@/api/admin/role';
-import { myRolePage } from '/@/api/my/role';
+import { myRolePage, delRole } from '/@/api/my/role';
 import { useMessage, useMessageBox } from '/@/hooks/message';
 import { useI18n } from 'vue-i18n';
-
 
 // 引入组件
 const RoleDialog = defineAsyncComponent(() => import('./form.vue'));
@@ -142,7 +141,8 @@ const exportExcel = () => {
 
 // 是否可以多选
 const handleSelectable = (row: any) => {
-	return row.roleId !== '1';
+	// return row.roleId !== '1';
+	return true;
 };
 
 // 多选事件
@@ -160,7 +160,7 @@ const handleDelete = async (ids: string[]) => {
 	}
 
 	try {
-		await delObj(ids);
+		await delRole(ids);
 		getDataList();
 		useMessage().success(t('common.delSuccessText'));
 	} catch (err: any) {

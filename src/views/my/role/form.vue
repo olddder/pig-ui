@@ -2,9 +2,6 @@
   <el-dialog :close-on-click-modal="false" :title="form.roleId ? $t('common.editBtn') : $t('common.addBtn')" width="600"
              draggable v-model="visible">
     <el-form :model="form" :rules="dataRules" label-width="90px" ref="dataFormRef" v-loading="loading">
-      <el-form-item :label="$t('sysrole.roleName')" prop="roleName">
-        <el-input :placeholder="$t('sysrole.please_enter_a_role_name')" clearable v-model="form.roleName"></el-input>
-      </el-form-item>
       <el-form-item :label="$t('sysrole.roleCode')" prop="roleCode">
         <el-input
             :placeholder="$t('sysrole.please_enter_the_role_Code')"
@@ -12,6 +9,9 @@
             clearable
             v-model="form.roleCode"
         ></el-input>
+      </el-form-item>
+      <el-form-item :label="$t('sysrole.roleName')" prop="roleName">
+        <el-input :placeholder="$t('sysrole.please_enter_a_role_name')" clearable v-model="form.roleName"></el-input>
       </el-form-item>
       <el-form-item :label="$t('sysrole.roleDesc')" prop="roleDesc">
         <el-input
@@ -38,7 +38,7 @@ import {deptTree} from '/@/api/admin/dept';
 import {useMessage} from '/@/hooks/message';
 import {addObj, getObj, putObj, validateRoleCode, validateRoleName} from '/@/api/admin/role';
 import { useI18n } from 'vue-i18n';
-import { getRole, updateRole} from '/@/my/admin/role';
+import { getRole, updateRole, addRole} from '/@/api/my/role';
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -86,13 +86,13 @@ const dataRules = ref({
   roleCode: [
     {required: true, message: '角色标识不能为空', trigger: 'blur'},
     {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur'},
-    {validator: rule.validatorCapital, trigger: 'blur'},
-    {
-      validator: (rule: any, value: any, callback: any) => {
-        validateRoleCode(rule, value, callback, form.roleId !== '');
-      },
-      trigger: 'blur',
-    },
+    // {validator: rule.validatorCapital, trigger: 'blur'},
+    // {
+    //   validator: (rule: any, value: any, callback: any) => {
+    //     validateRoleCode(rule, value, callback, form.roleId !== '');
+    //   },
+    //   trigger: 'blur',
+    // },
   ],
   roleDesc: [{max: 128, message: '长度在 128 个字符内', trigger: 'blur'}]
 });
@@ -123,7 +123,7 @@ const onSubmit = async () => {
 
   try {
     loading.value = true;
-    form.roleCode ? await updateRole(form) : await addObj(form);
+    form.roleId ? await updateRole(form) : await addRole(form);
     useMessage().success(t(form.roleId ? 'common.editSuccessText' : 'common.addSuccessText'));
     visible.value = false;
     emit('refresh');
@@ -135,9 +135,9 @@ const onSubmit = async () => {
 };
 
 // 初始化角色数据
-const getRoleData = (roleCode: string) => {
+const getRoleData = (id: string) => {
   // 获取角色数据
-  getRole(roleCode).then((res: any) => {
+  getRole(id).then((res: any) => {
     Object.assign(form, res.data);
     if (res.data.dsScope) {
       dataForm.checkedDsScope = res.data.dsScope.split(',');

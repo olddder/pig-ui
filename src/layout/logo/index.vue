@@ -1,6 +1,8 @@
 <template>
 	<div class="layout-logo" v-if="setShowLogo" @click="onThemeConfigChange">
-		<span>{{ themeConfig.globalTitle }}</span>
+		<img :src="bocLogo" class="layout-logo-boc" />
+		<span style="margin-left:10px;">个金营销中枢</span>
+		<!-- <span>{{ themeConfig.globalTitle }}</span> -->
 	</div>
 	<div class="layout-logo-size" v-else @click="onThemeConfigChange">
 		<img :src="logoMini" class="layout-logo-size-img" />
@@ -10,6 +12,7 @@
 <script setup lang="ts" name="layoutLogo">
 import { useThemeConfig } from '/@/stores/themeConfig';
 import logoMini from '/@/assets/logo-mini.svg';
+import bocLogo from '/@/assets/logo-boc.png';
 
 // 定义变量内容
 const storesThemeConfig = useThemeConfig();
@@ -28,6 +31,9 @@ const onThemeConfigChange = () => {
 </script>
 
 <style scoped lang="scss">
+.layout-logo-boc {
+	height: 80%;
+}
 .layout-logo {
 	width: 220px;
 	height: 50px;

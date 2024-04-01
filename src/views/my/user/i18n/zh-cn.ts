@@ -15,7 +15,7 @@ export default {
 		email: '邮箱',
 		nickname: '昵称',
 		inputUsernameTip: '请输入用户名',
-		inputPhoneTip: '请输入手机号',
+		inputEhrNoTip: '请输入员工号',
 		inputNameTip: '请输入姓名',
 		importUserTip: '用户导入',
 		deleteDisabledTip: 'admin 不允许被删除',
